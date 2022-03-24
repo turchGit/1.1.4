@@ -22,6 +22,7 @@ public class Util {
     public static void jdbcConnect(){
         try {
             connection = DriverManager.getConnection(URL,USERNAME,PASSWORD);
+            connection.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
         }

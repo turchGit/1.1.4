@@ -25,20 +25,32 @@ public class UserDaoJDBCImpl implements UserDao {
                     " lastName VARCHAR(20)," +
                     " age INT," +
                     "PRIMARY KEY (id))");
+            connection.commit();
             System.out.println("Таблица создана");
         } catch (SQLException e) {
             System.out.println("Таблица уже существует");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
 
     }
 
     public void dropUsersTable() {
         try {
-            PreparedStatement statement = connection.prepareStatement("DROP TABLE Users");
-            statement.executeUpdate();
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("DROP TABLE Users");
+            connection.commit();
 
         } catch (SQLException e) {
             System.out.println("Таблицы не существует");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
 
     }
@@ -51,9 +63,15 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.setString(2, lastName);
             statement.setByte(3, age);
             statement.executeUpdate();
+            connection.commit();
             System.out.println(String.format("Пользователь с именем %s добавлен в базу данных", name));
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -63,9 +81,15 @@ public class UserDaoJDBCImpl implements UserDao {
                     connection.prepareStatement("DELETE FROM Users WHERE id=?");
             statement.setLong(1,id);
             statement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
 
     }
@@ -73,9 +97,9 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         try {
-            PreparedStatement statement =
-                    connection.prepareStatement("SELECT * FROM Users");
-            ResultSet resultSet = statement.executeQuery();
+            Statement statement =
+                    connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Users");
             while (resultSet.next()){
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -84,8 +108,14 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(resultSet.getString("lastName"));
                 users.add(user);
             }
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
         return users;
     }
@@ -95,8 +125,14 @@ public class UserDaoJDBCImpl implements UserDao {
             PreparedStatement statement =
                     connection.prepareStatement("DELETE FROM Users");
             statement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             System.out.println("Таблицы не существует");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
 
 
